@@ -1,38 +1,34 @@
-import { Injectable, Inject } from '@graphql-modules/di';
-import { Chat } from './chat.type';
-import { CHATS } from './chats.symbol';
+import { Injectable } from '@graphql-modules/di'
+import { Chat } from './chat.type'
 
 @Injectable()
 export class ChatsProvider {
+  private chats: Chat[] = []
 
-  constructor(
-    @Inject(CHATS) private chats: Chat[],
-  ) {}
-
-  getChats(): Chat[] {
-    return this.chats;
+  getChats (): Chat[] {
+    return this.chats
   }
 
-  getChat(id: number): Chat {
-    return this.chats.find(chat => chat.id === id);
+  getChat (id: number): Chat {
+    return this.chats.find(chat => chat.id === id)
   }
 
-  createChat(chat: Chat): Chat {
-    const id = this.chats[this.chats.length-1].id + 1;
+  createChat (chat: Chat): Chat {
+    const id = Math.floor(Math.random() * 1e6)
 
     const newChat: Chat = {
-      id,
       ...chat,
-    };
+      id
+    }
 
-    this.chats.push(newChat);
+    this.chats.push(newChat)
 
-    return newChat;
+    return newChat
   }
 
-  deleteChat(id: number): number {
-    this.chats = this.chats.filter(chat => chat.id !== id);
+  deleteChat (id: number): number {
+    this.chats = this.chats.filter(chat => chat.id !== id)
 
-    return id;
+    return id
   }
 }

@@ -1,25 +1,17 @@
-import { GraphQLModule } from '@graphql-modules/core';
-import { ChatsProvider } from "./chats.provider";
-import { buildSchemaSync } from 'type-graphql';
-import { ChatResolver } from './chat.resolver';
-import { Chat } from './chat.type';
-import { CHATS } from './chats.symbol';
+import { GraphQLModule } from '@graphql-modules/core'
+import { ChatsProvider } from './chats.provider'
+import { buildSchemaSync } from 'type-graphql'
+import { ChatResolver } from './chat.resolver'
+import { NeoDBModule } from '../neo-db/neoDB.module'
 
 export const ChatsModule = new GraphQLModule({
-  providers: ({ config }: { config: { chats: Chat[] } }) => [
-    {
-      provide: CHATS,
-      useValue: config.chats,
-    },
-    ChatsProvider,
-    ChatResolver
-  ],
+  providers: [ChatsProvider, ChatResolver],
+  imports: [NeoDBModule],
+
   extraSchemas: () => [
     buildSchemaSync({
-      resolvers: [
-        ChatResolver
-      ],
+      resolvers: [ChatResolver],
       container: ({ context }) => context.injector
     })
   ]
-});
+})
