@@ -1,29 +1,24 @@
-import { Pool } from 'generic-pool'
 import { Injectable, ProviderScope } from '@graphql-modules/di'
-import { OnRequest, OnResponse } from '@graphql-modules/core'
-import Neode from 'neode'
+import * as Neode from 'neode'
+import { OnRequest } from '@graphql-modules/core'
 
+const url = 'bolt://localhost:7687'
+const username = 'neo4j'
+const password = 'local'
+
+const neoInstance = new Neode(url, username, password)
 @Injectable({
-  scope: ProviderScope.Session
+  scope: ProviderScope.Application
 })
-export class NeoDBProvider implements OnRequest, OnResponse {
-  private _poolClient: Neode
-  constructor (private readonly pool: Pool<Neode>) {}
+export class NeoDBProvider implements OnRequest {
+  private _poolClient: Neode = neoInstance
+  constructor () {}
+  onRequest (): void {
+    if (!this._poolClient) {
+      console.log('new instance..........')
 
-  public async onRequest (): Promise<any> {
-    this._poolClient = await this.pool.acquire()
-  }
-
-  public async onResponse (): Promise<any> {
-    if (this._poolClient) {
-      console.log(
-        '*********************** CONNECTION SHOULD BE CLOSED ****************'
-      )
-      await this.pool.release(this._poolClient)
+      this._poolClient = new Neode(url, username, password)
     }
-    console.log(
-      '*********************** CONNECTION SHOULD BE CLOSED  -*---------------- ****************'
-    )
   }
 
   public getClient (): Neode {
